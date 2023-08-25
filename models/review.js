@@ -3,9 +3,6 @@ const userSchema = require('~/models/user')
 const offerSchema = require('~/models/offer')
 const { USER, OFFER } = require('~/consts/models')
 const {
-  roles: { STUDENT }
-} = require('~/consts/auth')
-const {
   enums: { MAIN_ROLE_ENUM }
 } = require('~/consts/validation')
 const { ENUM_CAN_BE_ONE_OF } = require('~/consts/errors')
@@ -105,26 +102,16 @@ reviewSchema.statics.calcAverageRatings = async function (targetUserId, targetUs
   ])
 
   if (stats.length) {
-    const student = {
-      'totalReviews.student': stats[0].totalReviews.student,
-      'averageRating.student': stats[0].averageRating.student
-    }
-
     const tutor = {
       'totalReviews.tutor': stats[0].totalReviews.tutor,
       'averageRating.tutor': stats[0].averageRating.tutor
     }
 
-    const studentRating = { authorAvgRating: stats[0].averageRating.student }
-
     const tutorRating = { authorAvgRating: stats[0].averageRating.tutor }
 
-    await userSchema.findOneAndUpdate(
-      { _id: targetUserId, role: targetUserRole },
-      targetUserRole === STUDENT ? student : tutor
-    )
+    await userSchema.findOneAndUpdate({ _id: targetUserId, role: targetUserRole }, targetUserRole === tutor)
 
-    await offerSchema.updateMany({ author: targetUserId }, targetUserRole === STUDENT ? studentRating : tutorRating)
+    await offerSchema.updateMany({ author: targetUserId }, tutorRating)
   } else {
     await userSchema.findOneAndUpdate(
       { _id: targetUserId, role: targetUserRole },

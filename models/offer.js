@@ -13,7 +13,7 @@ const offerSchema = new Schema(
       type: Number
     },
     proficiencyLevel: {
-      type: [String],
+      type: String,
       enum: {
         values: PROFICIENCY_LEVEL_ENUM,
         message: ENUM_CAN_BE_ONE_OF('proficiency level', PROFICIENCY_LEVEL_ENUM)
@@ -82,17 +82,13 @@ const offerSchema = new Schema(
 )
 
 offerSchema.statics.calcTotalOffers = async function (category, subject, authorRole) {
-  const categoryTotalOffersQty = await this.countDocuments({ category, authorRole })
+  const categoryTotalOffersQty = await this.countDocuments({ authorRole })
   await Category.findByIdAndUpdate(category, { $set: { [`totalOffers.${authorRole}`]: categoryTotalOffersQty } }).exec()
-  const subjectTotalOffersQty = await this.countDocuments({ subject, authorRole })
+  const subjectTotalOffersQty = await this.countDocuments({ subject })
   await Subject.findByIdAndUpdate(subject, { $set: { [`totalOffers.${authorRole}`]: subjectTotalOffersQty } }).exec()
 }
 
 offerSchema.post('save', async function (doc) {
-  doc.constructor.calcTotalOffers(doc.category, doc.subject, doc.authorRole)
-})
-
-offerSchema.post('findOneAndRemove', async function (doc) {
   doc.constructor.calcTotalOffers(doc.category, doc.subject, doc.authorRole)
 })
 

@@ -1,6 +1,5 @@
 const Cooperation = require('~/models/cooperation')
-const { createError, createForbiddenError } = require('~/utils/errorsHelper')
-const { VALIDATION_ERROR } = require('~/consts/errors')
+const { createForbiddenError } = require('~/utils/errorsHelper')
 
 const cooperationService = {
   getCooperations: async (pipeline) => {
@@ -32,10 +31,6 @@ const cooperationService = {
   updateCooperation: async (id, currentUser, updateData) => {
     const { role: currentUserRole } = currentUser
     const { price, status } = updateData
-
-    if (price && status) {
-      throw createError(409, VALIDATION_ERROR('You can change only either the status or the price in one operation'))
-    }
 
     const cooperation = await Cooperation.findById(id)
 
