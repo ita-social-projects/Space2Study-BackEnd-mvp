@@ -7,7 +7,7 @@ const swaggerUI = require('swagger-ui-express')
 const {
   config: { CLIENT_URL }
 } = require('~/configs/config')
-const swaggerOptions = require('~/swagger-settings')
+const swaggerOptions = require('../../swagger-settings')
 const router = require('~/routes')
 const { createNotFoundError } = require('~/utils/errorsHelper')
 const errorMiddleware = require('~/middlewares/error')
